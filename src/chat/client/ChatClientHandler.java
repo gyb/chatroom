@@ -1,27 +1,30 @@
 package chat.client;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 
-public class ChatClientHandler implements ChannelHandler {
+import java.util.logging.Logger;
 
-	@Override
-	public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-		// TODO Auto-generated method stub
+import chat.message.ChatMessage;
 
+public class ChatClientHandler extends SimpleChannelInboundHandler<ChatMessage> {
+	private final static Logger logger = Logger.getLogger(ChatClientHandler.class.getName());
+
+	private Integer userId;
+	
+	public ChatClientHandler(Integer userId) {
+		this.userId = userId;
 	}
 
-	@Override
-	public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-		// TODO Auto-generated method stub
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        ctx.writeAndFlush(ChatMessage.fromJson("{\"type\":" + ChatMessage.TYPE_LOGIN + ", \"content\":" + userId + "}"));
+    }
 
-	}
-
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+	protected void channelRead0(ChannelHandlerContext ctx, ChatMessage msg)
 			throws Exception {
-		// TODO Auto-generated method stub
-
+    	logger.info("Received one msg:" + msg.getContent());
 	}
 
 }

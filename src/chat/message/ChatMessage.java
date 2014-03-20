@@ -16,6 +16,12 @@ public class ChatMessage {
 	private String content;
 	private String sendTime;
 	
+	public ChatMessage(int type, int sender, String content) {
+		this.type = type;
+		this.sender = sender;
+		this.content = content;
+	}
+	
 	public static ChatMessage fromJson(String json) {
 		return gson.fromJson(json, ChatMessage.class);
 	}

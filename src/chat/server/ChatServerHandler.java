@@ -3,6 +3,7 @@ package chat.server;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import chat.message.ChatMessage;
+import chat.server.clients.ClientsManager;
 import chat.server.handler.ChatHandler;
 import chat.server.handler.LoginHandler;
 import chat.server.handler.UnknownTypeHandler;
@@ -25,4 +26,9 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<ChatMessage> 
 		}
 	}
 
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+        ClientsManager.remove(ctx.channel());
+    }
 }
