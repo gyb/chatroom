@@ -5,6 +5,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import chat.message.ChatMessage;
 import chat.server.clients.ClientsManager;
 import chat.server.handler.ChatHandler;
+import chat.server.handler.ConfirmHandler;
 import chat.server.handler.LoginHandler;
 import chat.server.handler.UnknownTypeHandler;
 
@@ -19,6 +20,9 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<ChatMessage> 
 			break;
 		case ChatMessage.TYPE_CHAT:
 			new ChatHandler().handle(ctx.channel(), msg);
+			break;
+		case ChatMessage.TYPE_CONFIRM:
+			new ConfirmHandler().handle(ctx.channel(), msg);
 			break;
 		default:
 			new UnknownTypeHandler().handle(ctx.channel(), msg);

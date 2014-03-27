@@ -7,6 +7,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Random;
 
 import chat.message.ChatMessage;
@@ -17,9 +19,7 @@ public class ChatClient {
 
     private final String host;
     private final int port;
-    
-    private int userId;
-    private Channel channel;
+    private final int userId;
     
     public ChatClient() {
     	this(DEFAULT_HOST, DEFAULT_PORT);
@@ -38,19 +38,42 @@ public class ChatClient {
             Bootstrap b = new Bootstrap();
             b.group(group)
              .channel(NioSocketChannel.class)
-             .handler(new ChatClientInitializer());
+             .handler(new ChatClientInitializer(userId));
 
             // Start the client.
-            ChannelFuture f = b.connect(host, port).sync();
-            this.channel = f.channel();
+            Channel channel = b.connect(host, port).sync().channel();
+
+            // Read commands from the stdin.
+            ChannelFuture lastWriteFuture = null;
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            while (true) {
+                String line = in.readLine();
+                if (line == null) {
+                    break;
+                }
+
+                // Sends the received line to the server.
+                lastWriteFuture = channel.writeAndFlush(new ChatMessage(new Random().nextInt(), ChatMessage.TYPE_CHAT, userId, line));
+
+                // If user typed the 'bye' command, wait until the server closes
+                // the connection.
+                if ("exit".equals(line.toLowerCase()) || "bye".equals(line.toLowerCase())) {
+                	channel.closeFuture().sync();
+                    break;
+                }
+            }
+
+            // Wait until all messages are flushed before closing the channel.
+            if (lastWriteFuture != null) {
+                lastWriteFuture.sync();
+            }
         } finally {
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
         }
     }
-    
-    public void sendMessage(String msg) {
-    	channel.write(new ChatMessage(ChatMessage.TYPE_CHAT, userId, msg));
-    	channel.flush();
+
+    public static void main(String[] args) throws Exception {
+    	new ChatClient().run();
     }
 }

@@ -5,10 +5,15 @@ import java.nio.charset.Charset;
 import com.google.gson.Gson;
 
 public class ChatMessage {
+	public final static int TYPE_LOGIN = 1;
+	public final static int TYPE_CHAT = 2;
+	public final static int TYPE_CONFIRM = 3;
+
 	public final static Charset charset = Charset.forName("ISO-8859-1");
 	public final static int MESSAGE_MAX_LENGTH = 100000;
 	private final static Gson gson = new Gson();
 
+	private int id;
 	private int type;
 	private int sender;
 	private int group;
@@ -16,7 +21,8 @@ public class ChatMessage {
 	private String content;
 	private String sendTime;
 	
-	public ChatMessage(int type, int sender, String content) {
+	public ChatMessage(int id, int type, int sender, String content) {
+		this.id = id;
 		this.type = type;
 		this.sender = sender;
 		this.content = content;
@@ -54,8 +60,17 @@ public class ChatMessage {
 		return sendTime;
 	}
 
-	public final static int TYPE_LOGIN = 1;
-	public final static int TYPE_CHAT = 2;
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String toString() {
+		return this.toJson();
+	}
 //	public final static int SUCCESS =0;//表明是否成功
 //	public final static int FAIL =1;//表明失败
 //	public final static int COM_MES =2;//普通信息包

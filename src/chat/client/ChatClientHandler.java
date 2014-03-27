@@ -24,7 +24,11 @@ public class ChatClientHandler extends SimpleChannelInboundHandler<ChatMessage> 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, ChatMessage msg)
 			throws Exception {
-    	logger.info("Received one msg:" + msg.getContent());
+    	logger.info("Received a message: " + msg);
+    	if (msg.getType() == ChatMessage.TYPE_CHAT) {
+			ChatMessage message = new ChatMessage(0, ChatMessage.TYPE_CONFIRM, 0, "" + msg.getId());
+	        ctx.channel().writeAndFlush(message);
+    	}
 	}
 
 }

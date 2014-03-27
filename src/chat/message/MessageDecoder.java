@@ -23,6 +23,7 @@ public class MessageDecoder extends LineBasedFrameDecoder {
 		}
 
 		String json = byteBuf.toString(ChatMessage.charset);
+		logger.info("Received json message: " + json);
 		try {
 			return ChatMessage.fromJson(json);
 		} catch (Exception ex) {

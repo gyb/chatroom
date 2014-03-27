@@ -12,6 +12,7 @@ public class ChatHandler implements MessageHandler {
 
 	@Override
 	public void handle(Channel channel, ChatMessage message) {
+		logger.info("handle chat message ...");
 		Channel savedChannel = ClientsManager.get(message.getSender());
 		if (channel != savedChannel) {
 			logger.warning("Received message but not login, skip it");
@@ -22,7 +23,7 @@ public class ChatHandler implements MessageHandler {
 			if (channel == clientChannel) {
 				continue;
 			}
-			clientChannel.write(message);
+			clientChannel.writeAndFlush(message);
 		}
 	}
 
